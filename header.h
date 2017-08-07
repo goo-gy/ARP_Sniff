@@ -58,4 +58,4 @@ typedef struct tcp_header
 void request(unsigned char*, char*, unsigned char*, char*);
 void poisoning(unsigned char*, char*, unsigned char*, char*);
 void relay(unsigned char*, unsigned char*);
-void get_mymac(char *);
+void get_mymac(unsigned char *);

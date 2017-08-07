@@ -1,6 +1,6 @@
 #include "header.h"
 
-void get_mymac(char *my_mac)
+void get_mymac(unsigned char *my_mac)
 {
 	struct ifreq ifr;		//in <net/if.h>
 	struct ifconf ifc;		//	""
@@ -46,7 +46,7 @@ void get_mymac(char *my_mac)
 void request(unsigned char *my_mac, char *my_ip, unsigned char *target_mac, char *target_ip)
 {
 	printf("Getting MAC Address....\n");
-	int i;
+	unsigned int i;
 	ether_h ethernet;
 	for(i = 0; i < 6; i++)
 	{
@@ -209,7 +209,7 @@ void relay(unsigned char *my_mac, unsigned char *target_mac)
 			break;
 		}
 		// ADD Filter
-		relay = (char*)malloc(header->len);
+		relay = (unsigned char*)malloc(header->len);
 		memcpy(relay, packet, header->len);
 		memcpy(relay_ether, relay, sizeof(ether_h));
 		for( i = 0; i < 6; i++)
@@ -219,7 +219,7 @@ void relay(unsigned char *my_mac, unsigned char *target_mac)
 		}
 		memcpy(relay, relay_ether, sizeof(ether_h));
 
-		for( i = 0; i < header->len; i++)
+		for( i = 0; i < (unsigned char)(header->len); i++)
 		{
 			printf("%02x ", relay[i]);
 		}
