@@ -191,10 +191,9 @@ void relay(unsigned char *my_mac, unsigned char *target_mac)
 	pcap_t *handle = pcap_open_live(dev, 65536, 1, 1000, errbuf);	//length
 	struct pcap_pkthdr *header;
 	const unsigned char *packet;
-	unsigned char *send_packet;
 					//why 65536
 	int is_ok, i;	
-	char *relay;
+	unsigned char *relay;
 	ether_h *relay_ether = (ether_h*)malloc(sizeof(ether_h));
 	while(1)
 	{
@@ -209,30 +208,32 @@ void relay(unsigned char *my_mac, unsigned char *target_mac)
 			printf("Interface Down\n");
 			break;
 		}
+		// ADD Filter
 		relay = (char*)malloc(header->len);
 		memcpy(relay, packet, header->len);
 		memcpy(relay_ether, relay, sizeof(ether_h));
-		printf("Copied Successfully!\n");
 		for( i = 0; i < 6; i++)
 		{
 			relay_ether->src[i] = my_mac[i];
 			relay_ether->dst[i] = target_mac[i];
 		}
+		memcpy(relay, relay_ether, sizeof(ether_h));
 
-		for( i = 0; i < 6; i++)
-			printf(":%x", relay_ether->src[i]);
-		printf("\n");
-		for( i = 0; i < 6; i++)
-			printf(":%x", relay_ether->dst[i]);
-		if(pcap_sendpacket(handle, send_packet, header->len) != 0)
+		for( i = 0; i < header->len; i++)
 		{
-			printf("%s\n", pcap_geterr(handle));
+			printf("%02x ", relay[i]);
+		}
+		printf("\n");
+		
+		if(pcap_sendpacket(handle, relay, header->len) != 0)
+		{
+			printf("%s\n\n", pcap_geterr(handle));
 		}
 		else
 		{
-			for (int k = 0; k < 6; k++)
-				printf("%x:", relay_ether->dst[k]);
+			printf("Send Success!\n\n");
 		}
+		free(relay);
 	}
-	free(send_packet);
+	free(relay_ether);
 }
